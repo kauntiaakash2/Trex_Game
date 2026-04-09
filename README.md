@@ -6,35 +6,9 @@ A colorful T-Rex endless runner that now runs **directly in your browser** (HTML
 
 ---
 
-## 🌐 Play Online (Deploy in minutes)
+## 🌐 Play Online
 
-You can deploy this as a static site on **GitHub Pages**, **Netlify**, or **Vercel**.
-
-### Option A: GitHub Pages
-
-1. Push this repository to GitHub.
-2. Go to **Settings → Pages**.
-3. Under **Build and deployment**, choose:
-   - **Source:** `Deploy from a branch`
-   - **Branch:** `main` (or your default branch), folder `/ (root)`
-4. Save and wait for deployment.
-5. Your game will be available at:
-   `https://<your-username>.github.io/<repo-name>/`
-
-### Option B: Netlify
-
-1. Create a new site from your Git repo.
-2. Build command: *(leave empty)*
-3. Publish directory: `.`
-4. Deploy.
-
-### Option C: Vercel
-
-1. Import your repo into Vercel.
-2. Framework preset: **Other**.
-3. Build command: *(none)*
-4. Output directory: `.`
-5. Deploy.
+**Game** **available** **at:** https://trex-game-iota.vercel.app/
 
 ---
 
