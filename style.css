@@ -1,0 +1,87 @@
+:root {
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
+  background: radial-gradient(circle at top, #eaf7ff, #d4ebf8 50%, #c1e0f0);
+  color: #183042;
+}
+
+.wrapper {
+  width: min(1024px, 95vw);
+  text-align: center;
+  padding-bottom: 1rem;
+}
+
+h1 {
+  margin: 0.4rem 0 0.2rem;
+}
+
+.subtitle {
+  margin-top: 0;
+  opacity: 0.85;
+}
+
+canvas {
+  width: 100%;
+  max-width: 960px;
+  border-radius: 14px;
+  border: 2px solid #2f4858;
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.18);
+  background: #fff;
+  touch-action: none;
+}
+
+.controls {
+  margin: 0.8rem auto 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+}
+
+kbd {
+  font: inherit;
+  padding: 0.1rem 0.35rem;
+  border: 1px solid #7e9db1;
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.touch-controls {
+  margin-top: 0.75rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.touch-controls button {
+  border: none;
+  background: #1f5f80;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 0.55rem 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+}
+
+.touch-controls button:active {
+  transform: translateY(1px);
+}
+
+@media (min-width: 900px) {
+  .touch-controls {
+    display: none;
+  }
+}
