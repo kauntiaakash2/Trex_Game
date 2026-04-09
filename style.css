@@ -17,6 +17,7 @@ body {
 .wrapper {
   width: min(1024px, 95vw);
   text-align: center;
+  padding-bottom: 1rem;
 }
 
 h1 {
@@ -35,6 +36,7 @@ canvas {
   border: 2px solid #2f4858;
   box-shadow: 0 16px 38px rgba(0, 0, 0, 0.18);
   background: #fff;
+  touch-action: none;
 }
 
 .controls {
@@ -53,4 +55,33 @@ kbd {
   border-bottom-width: 2px;
   border-radius: 4px;
   background: #fff;
+}
+
+.touch-controls {
+  margin-top: 0.75rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.touch-controls button {
+  border: none;
+  background: #1f5f80;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 0.55rem 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+}
+
+.touch-controls button:active {
+  transform: translateY(1px);
+}
+
+@media (min-width: 900px) {
+  .touch-controls {
+    display: none;
+  }
 }

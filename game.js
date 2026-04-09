@@ -1,5 +1,8 @@
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
+const jumpBtn = document.getElementById('btn-jump');
+const duckBtn = document.getElementById('btn-duck');
+const restartBtn = document.getElementById('btn-restart');
 
 const WORLD = {
   width: canvas.width,
@@ -12,7 +15,6 @@ const WORLD = {
   speedStep: 0.18,
 };
 
-const keys = new Set();
 let started = false;
 let gameOver = false;
 let score = 0;
@@ -225,20 +227,44 @@ function tick(ts) {
   requestAnimationFrame(tick);
 }
 
-document.addEventListener('keydown', (e) => {
-  keys.add(e.key.toLowerCase());
-  if ((e.key === ' ' || e.key === 'ArrowUp') && !gameOver) {
-    e.preventDefault();
+function handleJump() {
+  if (!gameOver) {
     started = true;
     dino.jump();
   }
+}
+
+document.addEventListener('keydown', (e) => {
+  if ([" ", "ArrowUp", "ArrowDown"].includes(e.key)) e.preventDefault();
+  if ((e.key === ' ' || e.key === 'ArrowUp') && !gameOver) handleJump();
   if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') dino.setDuck(true);
   if ((e.key === 'r' || e.key === 'R') && gameOver) reset();
 });
 
 document.addEventListener('keyup', (e) => {
-  keys.delete(e.key.toLowerCase());
   if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') dino.setDuck(false);
+});
+
+jumpBtn?.addEventListener('click', handleJump);
+restartBtn?.addEventListener('click', () => gameOver && reset());
+
+duckBtn?.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  dino.setDuck(true);
+});
+
+const stopDuck = (e) => {
+  e.preventDefault();
+  dino.setDuck(false);
+};
+
+duckBtn?.addEventListener('pointerup', stopDuck);
+duckBtn?.addEventListener('pointercancel', stopDuck);
+duckBtn?.addEventListener('pointerleave', stopDuck);
+
+canvas.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  handleJump();
 });
 
 function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
