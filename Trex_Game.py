@@ -113,7 +113,7 @@ def draw_background(screen: pygame.Surface, score: int):
     pygame.draw.rect(screen, GROUND_BROWN, (0, GROUND_Y, SCREEN_WIDTH, SCREEN_HEIGHT - GROUND_Y))
     pygame.draw.rect(screen, GRASS_GREEN, (0, GROUND_Y - 8, SCREEN_WIDTH, 8))
 
-
+  
 def draw_text(screen: pygame.Surface, font: pygame.font.Font, text: str, x: int, y: int, color=TEXT_DARK):
     surface = font.render(text, True, color)
     screen.blit(surface, (x, y))
