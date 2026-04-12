@@ -3,6 +3,10 @@ const ctx = canvas.getContext('2d');
 const jumpBtn = document.getElementById('btn-jump');
 const duckBtn = document.getElementById('btn-duck');
 const restartBtn = document.getElementById('btn-restart');
+const scoreForm = document.getElementById('score-form');
+const playerNameInput = document.getElementById('player-name');
+const leaderboardList = document.getElementById('leaderboard-list');
+const scoreMessage = document.getElementById('score-message');
 
 const WORLD = {
   width: canvas.width,
@@ -22,6 +26,7 @@ let best = 0;
 let speed = WORLD.startSpeed;
 let groundScroll = 0;
 let lastTs = 0;
+let scoreSubmitted = false;
 
 class Dino {
   constructor() {
@@ -32,9 +37,7 @@ class Dino {
     this.ducking = false;
   }
 
-  get onGround() {
-    return this.rect.y + this.rect.h >= WORLD.groundY;
-  }
+  get onGround() { return this.rect.y + this.rect.h >= WORLD.groundY; }
 
   jump() {
     if (this.onGround) {
@@ -115,6 +118,8 @@ function reset() {
   score = 0;
   speed = WORLD.startSpeed;
   groundScroll = 0;
+  scoreSubmitted = false;
+  scoreMessage.textContent = '';
 }
 
 function intersects(a, b) {
@@ -124,7 +129,6 @@ function intersects(a, b) {
 function drawBackground() {
   ctx.fillStyle = '#b6ebff';
   ctx.fillRect(0, 0, WORLD.width, WORLD.height);
-
   ctx.fillStyle = '#ffd949';
   ctx.beginPath();
   ctx.arc(820, 80, 34, 0, Math.PI * 2);
@@ -175,7 +179,6 @@ function drawHUD() {
     ctx.strokeStyle = '#5b6770';
     ctx.lineWidth = 3;
     ctx.strokeRect(250, 115, 460, 190);
-
     ctx.fillStyle = '#1f2e39';
     ctx.font = '54px Segoe UI, sans-serif';
     ctx.fillText('Game Over', 338, 175);
@@ -192,7 +195,6 @@ function update() {
 
   groundScroll = (groundScroll + speed) % (WORLD.width + 45);
   dino.update();
-
   for (const o of obstacles) o.update();
 
   if (obstacles[0] && obstacles[0].rect.x + obstacles[0].rect.w < 0) {
@@ -207,6 +209,9 @@ function update() {
   if (obstacles.some(o => intersects(dino.rect, o.rect))) {
     gameOver = true;
     playTone(180, 0.18, 0.06);
+    if (!scoreSubmitted && score > 0) {
+      scoreMessage.textContent = 'Game over! Enter name and submit your score.';
+    }
   }
 }
 
@@ -261,11 +266,65 @@ const stopDuck = (e) => {
 duckBtn?.addEventListener('pointerup', stopDuck);
 duckBtn?.addEventListener('pointercancel', stopDuck);
 duckBtn?.addEventListener('pointerleave', stopDuck);
-
 canvas.addEventListener('pointerdown', (e) => {
   e.preventDefault();
   handleJump();
 });
+
+scoreForm?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = playerNameInput.value.trim();
+  if (!gameOver) {
+    scoreMessage.textContent = 'Finish a run before submitting.';
+    return;
+  }
+  if (!name) {
+    scoreMessage.textContent = 'Please enter your name.';
+    return;
+  }
+  if (score <= 0) {
+    scoreMessage.textContent = 'Score must be greater than 0.';
+    return;
+  }
+
+  try {
+    await submitScore(name, score);
+    scoreSubmitted = true;
+    scoreMessage.textContent = 'Score submitted! Leaderboard updated.';
+    await fetchLeaderboard();
+  } catch (err) {
+    scoreMessage.textContent = `Could not submit score: ${err.message}`;
+  }
+});
+
+async function fetchLeaderboard() {
+  try {
+    const resp = await fetch('/api/leaderboard?limit=10');
+    if (!resp.ok) throw new Error('Leaderboard unavailable');
+    const data = await resp.json();
+    leaderboardList.innerHTML = '';
+    data.entries.forEach((entry) => {
+      const li = document.createElement('li');
+      const when = new Date(entry.created_at).toLocaleDateString();
+      li.textContent = `${entry.name} — ${entry.score} pts (${when})`;
+      leaderboardList.appendChild(li);
+    });
+  } catch (_) {
+    leaderboardList.innerHTML = '<li>Unable to load leaderboard from server.</li>';
+  }
+}
+
+async function submitScore(name, scoreValue) {
+  const resp = await fetch('/api/leaderboard', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, score: scoreValue }),
+  });
+  if (!resp.ok) {
+    const payload = await resp.json().catch(() => ({}));
+    throw new Error(payload.error || 'submission failed');
+  }
+}
 
 function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
@@ -309,5 +368,6 @@ function playTone(freq, duration, gainValue) {
   }
 }
 
+fetchLeaderboard();
 render();
 requestAnimationFrame(tick);

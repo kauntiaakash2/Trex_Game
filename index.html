@@ -9,7 +9,7 @@
 <body>
   <main class="wrapper">
     <h1>🦖 T-Rex Runner</h1>
-    <p class="subtitle">Jump, duck, and survive. Works directly in your browser.</p>
+    <p class="subtitle">Jump, duck, and survive. Compete on the global leaderboard.</p>
 
     <canvas id="game" width="960" height="420" aria-label="T-Rex Runner game canvas"></canvas>
 
@@ -24,6 +24,16 @@
       <button id="btn-jump" type="button">Jump</button>
       <button id="btn-duck" type="button">Duck</button>
       <button id="btn-restart" type="button">Restart</button>
+    </section>
+
+    <section class="leaderboard">
+      <h2>🏆 Live Leaderboard</h2>
+      <form id="score-form" class="score-form">
+        <input id="player-name" maxlength="20" placeholder="Enter your name" required />
+        <button id="btn-submit-score" type="submit">Submit Score</button>
+      </form>
+      <p id="score-message" class="score-message"></p>
+      <ol id="leaderboard-list"></ol>
     </section>
   </main>
 

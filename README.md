@@ -1,14 +1,17 @@
-# 🦖 T-Rex Runner — Play in the Browser
+# 🦖 T-Rex Runner — Multiplayer Leaderboard Edition
 
 ![T-Rex Runner Banner](./Trex_Game.png)
 
-A colorful T-Rex endless runner that now runs **directly in your browser** (HTML/CSS/JavaScript) and includes sound effects, jump/duck controls, speed progression, and score tracking.
+A colorful browser T-Rex runner with a **shared persistent leaderboard**.
+Players can submit scores, and everyone visiting your deployed app can compete on the same ranking.
 
 ---
 
-## 🌐 Play Online
+## 🏆 Shared Leaderboard (How it works)
 
-**Game** **available** **at:** https://trex-game-iota.vercel.app/
+- Scores are stored in a server-side **SQLite** database (`leaderboard.db`).
+- Anyone opening the same deployed URL sees the same top scores.
+- Submit your name + score after a run and challenge others.
 
 ---
 
@@ -25,25 +28,28 @@ A colorful T-Rex endless runner that now runs **directly in your browser** (HTML
 ## ✨ Features
 
 - Browser-ready canvas game (`index.html` + `game.js`)
+- Persistent cross-user leaderboard API (`app.py`)
 - Mobile-friendly touch buttons (Jump, Duck, Restart)
-- Bright colorful visuals (sky, clouds, ground, sun)
-- Dino jump + duck mechanics
-- Mixed obstacle types (cactus + bird)
-- Progressive difficulty (speed ramps up)
-- Score + best score HUD
-- Procedural sound effects with Web Audio API
+- Bright visuals and procedural Web Audio effects
+- Progressive speed + obstacle variety
 
 ---
 
-## 🧪 Run Locally
+## 🚀 Run Locally
 
-Because browsers can block some features when opening files directly, run a small local server:
+### 1) Install dependencies
 
 ```bash
-python -m http.server 8000
+pip install -r requirements.txt
 ```
 
-Then open:
+### 2) Start server
+
+```bash
+python app.py
+```
+
+### 3) Open in browser
 
 ```text
 http://localhost:8000
@@ -51,13 +57,27 @@ http://localhost:8000
 
 ---
 
+## 🌐 Deploy Online (so others can compete)
+
+Because leaderboard data is stored server-side, deploy this as a **Python web app** (not static-only):
+
+- **Render / Railway / Fly.io** (recommended)
+- Start command: `python app.py`
+- Expose port `8000`
+- Keep a persistent disk/volume if you want leaderboard data to survive restarts
+
+---
+
 ## 📁 Project Files
 
 ```text
 .
-├── index.html
+├── app.py              # Flask app + leaderboard API + static file host
+├── requirements.txt    # Python dependencies
+├── index.html          # Browser UI
 ├── style.css
 ├── game.js
+├── leaderboard.db      # Auto-created after first run
 ├── Trex_Game.py        # Original pygame version
 ├── Trex_Game.png
 └── README.md
