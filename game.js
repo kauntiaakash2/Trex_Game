@@ -300,17 +300,24 @@ scoreForm?.addEventListener('submit', async (e) => {
 async function fetchLeaderboard() {
   try {
     const resp = await fetch('/api/leaderboard?limit=10');
-    if (!resp.ok) throw new Error('Leaderboard unavailable');
-    const data = await resp.json();
+    const payload = await resp.json().catch(() => ({}));
+    if (!resp.ok) throw new Error(payload.error || 'Leaderboard unavailable');
+
     leaderboardList.innerHTML = '';
-    data.entries.forEach((entry) => {
+    const entries = payload.entries || [];
+    if (!entries.length) {
+      leaderboardList.innerHTML = '<li>No scores yet. Be the first!</li>';
+      return;
+    }
+
+    entries.forEach((entry) => {
       const li = document.createElement('li');
       const when = new Date(entry.created_at).toLocaleDateString();
       li.textContent = `${entry.name} — ${entry.score} pts (${when})`;
       leaderboardList.appendChild(li);
     });
-  } catch (_) {
-    leaderboardList.innerHTML = '<li>Unable to load leaderboard from server.</li>';
+  } catch (err) {
+    leaderboardList.innerHTML = `<li>Unable to load leaderboard: ${err.message}</li>`;
   }
 }
 

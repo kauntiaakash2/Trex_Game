@@ -1,17 +1,33 @@
-# 🦖 T-Rex Runner — Multiplayer Leaderboard Edition
+# 🦖 T-Rex Runner — Online Multiplayer Leaderboard
 
 ![T-Rex Runner Banner](./Trex_Game.png)
 
-A colorful browser T-Rex runner with a **shared persistent leaderboard**.
-Players can submit scores, and everyone visiting your deployed app can compete on the same ranking.
+A browser T-Rex runner with a **real online leaderboard**.
+Players submit scores to a shared backend so everyone can compete on the same ranking.
 
 ---
 
-## 🏆 Shared Leaderboard (How it works)
+## ✅ Why leaderboard failed before on Vercel
 
-- Scores are stored in a server-side **SQLite** database (`leaderboard.db`).
-- Anyone opening the same deployed URL sees the same top scores.
-- Submit your name + score after a run and challenge others.
+Static deployments cannot write to local files (`leaderboard.db`) in a persistent way.
+To work online, Vercel needs a hosted data store.
+
+This repo now uses a Vercel Serverless API route (`/api/leaderboard`) backed by **Vercel KV (Upstash Redis)**.
+
+---
+
+## 🚀 Vercel Setup (required for online leaderboard)
+
+1. In your Vercel project, go to **Storage**.
+2. Create/connect **KV (Upstash Redis)**.
+3. Ensure these env vars exist (Vercel adds them automatically when KV is linked):
+   - `KV_REST_API_URL`
+   - `KV_REST_API_TOKEN`
+4. Redeploy the project.
+
+After this, leaderboard reads/writes work online at:
+- `GET /api/leaderboard`
+- `POST /api/leaderboard`
 
 ---
 
@@ -27,44 +43,30 @@ Players can submit scores, and everyone visiting your deployed app can compete o
 
 ## ✨ Features
 
-- Browser-ready canvas game (`index.html` + `game.js`)
-- Persistent cross-user leaderboard API (`app.py`)
-- Mobile-friendly touch buttons (Jump, Duck, Restart)
-- Bright visuals and procedural Web Audio effects
-- Progressive speed + obstacle variety
+- Browser canvas game (`index.html` + `game.js`)
+- Serverless API leaderboard (`api/leaderboard.py`)
+- Shared cross-user persistent scores (via Vercel KV)
+- Mobile-friendly touch controls
+- Procedural game sounds
 
 ---
 
-## 🚀 Run Locally
+## 🧪 Local Run
 
-### 1) Install dependencies
+### Python mode (legacy local backend)
 
 ```bash
 pip install -r requirements.txt
-```
-
-### 2) Start server
-
-```bash
 python app.py
 ```
 
-### 3) Open in browser
+Open:
 
 ```text
 http://localhost:8000
 ```
 
----
-
-## 🌐 Deploy Online (so others can compete)
-
-Because leaderboard data is stored server-side, deploy this as a **Python web app** (not static-only):
-
-- **Render / Railway / Fly.io** (recommended)
-- Start command: `python app.py`
-- Expose port `8000`
-- Keep a persistent disk/volume if you want leaderboard data to survive restarts
+> Note: local mode uses SQLite; production Vercel mode uses KV.
 
 ---
 
@@ -72,14 +74,14 @@ Because leaderboard data is stored server-side, deploy this as a **Python web ap
 
 ```text
 .
-├── app.py              # Flask app + leaderboard API + static file host
-├── requirements.txt    # Python dependencies
-├── index.html          # Browser UI
+├── api/
+│   └── leaderboard.py   # Vercel serverless leaderboard API
+├── app.py               # Local Flask server with SQLite
+├── index.html
 ├── style.css
 ├── game.js
-├── leaderboard.db      # Auto-created after first run
-├── Trex_Game.py        # Original pygame version
+├── requirements.txt
+├── Trex_Game.py         # Original pygame version
 ├── Trex_Game.png
 └── README.md
 ```
-
