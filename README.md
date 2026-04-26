@@ -1,4 +1,4 @@
-# 🦖 T-Rex Runner — Online Multiplayer Leaderboard
+# 🦖 T-Rex Runner Online Multiplayer Leaderboard
 
 ![T-Rex Runner Banner](./Trex_Game.png)
 
