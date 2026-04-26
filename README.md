@@ -44,6 +44,7 @@ After this, leaderboard reads/writes work online at:
 ## ✨ Features
 
 - Browser canvas game (`index.html` + `game.js`)
+- Futuristic neon "3D-style" visual makeover (glass UI, depth layers, perspective road)
 - Serverless API leaderboard (`api/leaderboard.py`)
 - Shared cross-user persistent scores (via Vercel KV)
 - Mobile-friendly touch controls

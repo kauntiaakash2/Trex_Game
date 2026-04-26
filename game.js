@@ -28,6 +28,13 @@ let groundScroll = 0;
 let lastTs = 0;
 let scoreSubmitted = false;
 
+const stars = Array.from({ length: 45 }, () => ({
+  x: Math.random() * WORLD.width,
+  y: Math.random() * 180,
+  size: Math.random() * 2 + 0.5,
+  glow: Math.random() * 0.8 + 0.2,
+}));
+
 class Dino {
   constructor() {
     this.standH = 56;
@@ -70,8 +77,19 @@ class Dino {
   }
 
   draw() {
-    roundRect(this.rect.x, this.rect.y, this.rect.w, this.rect.h, 8, this.ducking ? '#1f6b54' : '#246f48');
+    ctx.save();
+    const grad = ctx.createLinearGradient(this.rect.x, this.rect.y, this.rect.x + this.rect.w, this.rect.y + this.rect.h);
+    grad.addColorStop(0, this.ducking ? '#22ff9f' : '#5effd0');
+    grad.addColorStop(1, this.ducking ? '#0c8060' : '#1abf98');
+    roundRect(this.rect.x, this.rect.y, this.rect.w, this.rect.h, 10, grad);
+
+    ctx.fillStyle = 'rgba(255,255,255,0.8)';
+    roundRect(this.rect.x + 8, this.rect.y + 8, Math.max(8, this.rect.w * 0.3), 8, 4, ctx.fillStyle);
+
+    ctx.shadowBlur = 14;
+    ctx.shadowColor = 'rgba(76,255,216,0.75)';
     roundRect(this.rect.x + this.rect.w - 15, this.rect.y + 10, 6, 6, 2, '#ffffff');
+    ctx.restore();
   }
 }
 
@@ -91,14 +109,23 @@ class Obstacle {
 
   draw() {
     if (this.kind === 'bird') {
-      ctx.fillStyle = '#e2763f';
+      const birdGrad = ctx.createLinearGradient(this.rect.x, this.rect.y, this.rect.x + this.rect.w, this.rect.y + this.rect.h);
+      birdGrad.addColorStop(0, '#ff92d5');
+      birdGrad.addColorStop(1, '#ff4eaf');
+      ctx.fillStyle = birdGrad;
       ellipse(this.rect.x + this.rect.w / 2, this.rect.y + this.rect.h / 2, this.rect.w / 2, this.rect.h / 2);
-      ctx.fillStyle = '#ffffff';
+      ctx.fillStyle = '#fefefe';
       ellipse(this.rect.x + 18, this.rect.y + 13, 8, 4);
     } else {
-      roundRect(this.rect.x, this.rect.y, this.rect.w, this.rect.h, 5, '#1a7a47');
-      roundRect(this.rect.x - 10, this.rect.y + this.rect.h / 3, 10, 8, 3, '#1a7a47');
+      const cactusGrad = ctx.createLinearGradient(this.rect.x, this.rect.y, this.rect.x + this.rect.w, this.rect.y + this.rect.h);
+      cactusGrad.addColorStop(0, '#66f67f');
+      cactusGrad.addColorStop(1, '#17a24a');
+      roundRect(this.rect.x, this.rect.y, this.rect.w, this.rect.h, 6, cactusGrad);
+      roundRect(this.rect.x - 10, this.rect.y + this.rect.h / 3, 10, 8, 3, '#3ad06a');
     }
+
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    ellipse(this.rect.x + this.rect.w / 2, WORLD.groundY + 4, this.rect.w * 0.55, 5);
   }
 }
 
@@ -106,7 +133,7 @@ let dino = new Dino();
 let obstacles = [new Obstacle(WORLD.width + 180), new Obstacle(WORLD.width + 520)];
 
 function spawnObstacle() {
-  const lastRight = Math.max(...obstacles.map(o => o.rect.x + o.rect.w), WORLD.width);
+  const lastRight = Math.max(...obstacles.map((o) => o.rect.x + o.rect.w), WORLD.width);
   obstacles.push(new Obstacle(lastRight + randInt(280, 460)));
 }
 
@@ -127,67 +154,120 @@ function intersects(a, b) {
 }
 
 function drawBackground() {
-  ctx.fillStyle = '#b6ebff';
+  const skyGrad = ctx.createLinearGradient(0, 0, 0, WORLD.height);
+  skyGrad.addColorStop(0, '#120925');
+  skyGrad.addColorStop(0.52, '#1f335a');
+  skyGrad.addColorStop(1, '#172033');
+  ctx.fillStyle = skyGrad;
   ctx.fillRect(0, 0, WORLD.width, WORLD.height);
-  ctx.fillStyle = '#ffd949';
+
+  stars.forEach((star) => {
+    ctx.fillStyle = `rgba(166,220,255,${star.glow})`;
+    ctx.beginPath();
+    ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  const moonGrad = ctx.createRadialGradient(790, 76, 5, 790, 76, 52);
+  moonGrad.addColorStop(0, 'rgba(255,242,201,1)');
+  moonGrad.addColorStop(1, 'rgba(255,242,201,0)');
+  ctx.fillStyle = moonGrad;
   ctx.beginPath();
-  ctx.arc(820, 80, 34, 0, Math.PI * 2);
+  ctx.arc(790, 76, 52, 0, Math.PI * 2);
   ctx.fill();
 
-  const cloudOffset = (score * 2) % (WORLD.width + 220);
-  const baseX = WORLD.width - cloudOffset;
-  drawCloud((baseX % (WORLD.width + 220)) - 80, 70);
-  drawCloud(((baseX + 180) % (WORLD.width + 220)) - 80, 96);
+  ctx.fillStyle = '#ffe8b2';
+  ctx.beginPath();
+  ctx.arc(790, 76, 27, 0, Math.PI * 2);
+  ctx.fill();
 
-  ctx.fillStyle = '#7c5330';
-  ctx.fillRect(0, WORLD.groundY, WORLD.width, WORLD.height - WORLD.groundY);
-  ctx.fillStyle = '#5aa53d';
-  ctx.fillRect(0, WORLD.groundY - 8, WORLD.width, 8);
+  drawMountainLayer('#3d2b73', 178, 36, 0.35);
+  drawMountainLayer('#2f2f68', 220, 44, 0.55);
 
+  const horizon = WORLD.groundY - 8;
+  const roadGrad = ctx.createLinearGradient(0, horizon, 0, WORLD.height);
+  roadGrad.addColorStop(0, '#4b2f73');
+  roadGrad.addColorStop(1, '#1a1738');
+  ctx.fillStyle = roadGrad;
+  ctx.fillRect(0, horizon, WORLD.width, WORLD.height - horizon);
+
+  ctx.fillStyle = '#4ef7ff';
+  ctx.fillRect(0, WORLD.groundY - 6, WORLD.width, 2);
+
+  ctx.strokeStyle = 'rgba(132,220,255,0.38)';
+  ctx.lineWidth = 1;
+  for (let x = -80; x <= WORLD.width + 100; x += 40) {
+    const px = (x - groundScroll * 1.4) % (WORLD.width + 120);
+    ctx.beginPath();
+    ctx.moveTo(px, WORLD.groundY);
+    ctx.lineTo(WORLD.width / 2, WORLD.height);
+    ctx.stroke();
+  }
+
+  ctx.fillStyle = 'rgba(44,225,255,0.6)';
   for (let x = -45; x <= WORLD.width + 45; x += 45) {
     const px = (x - groundScroll) % (WORLD.width + 45) - 8;
-    ctx.fillStyle = '#222';
     ctx.beginPath();
     ctx.arc(px, WORLD.groundY + 28, 2, 0, Math.PI * 2);
     ctx.fill();
   }
 }
 
-function drawCloud(x, y) {
-  ctx.fillStyle = '#ffffff';
-  ellipse(x + 44, y + 14, 35, 17);
-  ellipse(x + 70, y + 12, 30, 15);
-  ellipse(x + 24, y + 15, 28, 14);
+function drawMountainLayer(color, baseY, amp, speedFactor) {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(0, WORLD.groundY);
+  for (let x = 0; x <= WORLD.width; x += 8) {
+    const y = baseY + Math.sin((x + groundScroll * speedFactor) * 0.012) * amp;
+    ctx.lineTo(x, y);
+  }
+  ctx.lineTo(WORLD.width, WORLD.groundY);
+  ctx.closePath();
+  ctx.fill();
 }
 
 function drawHUD() {
-  ctx.fillStyle = '#1f2e39';
-  ctx.font = '24px Segoe UI, sans-serif';
-  ctx.fillText(`Score: ${score}`, 18, 34);
-  ctx.fillText(`Best: ${best}`, 18, 62);
-  ctx.fillText(`Speed: ${speed.toFixed(1)}`, 18, 90);
-  ctx.font = '20px Segoe UI, sans-serif';
-  ctx.fillText('SPACE/↑ Jump   ↓/S Duck', 650, 30);
+  glassPanel(12, 12, 210, 98);
+  ctx.fillStyle = '#e0f4ff';
+  ctx.font = '700 24px Inter, Segoe UI, sans-serif';
+  ctx.fillText(`Score: ${score}`, 24, 40);
+  ctx.fillText(`Best: ${best}`, 24, 68);
+  ctx.fillText(`Speed: ${speed.toFixed(1)}`, 24, 96);
+
+  glassPanel(660, 12, 286, 42);
+  ctx.font = '600 24px Inter, Segoe UI, sans-serif';
+  ctx.fillStyle = '#b5e8ff';
+  ctx.fillText('SPACE/↑ Jump   ↓/S Duck', 676, 41);
 
   if (!started && !gameOver) {
-    ctx.font = '28px Segoe UI, sans-serif';
-    ctx.fillText('Press SPACE to start', 340, 132);
+    glassPanel(300, 108, 360, 64);
+    ctx.font = '700 30px Inter, Segoe UI, sans-serif';
+    ctx.fillStyle = '#f8feff';
+    ctx.fillText('Press SPACE to start', 328, 150);
   }
 
   if (gameOver) {
-    roundRect(250, 115, 460, 190, 12, '#ffffff');
-    ctx.strokeStyle = '#5b6770';
-    ctx.lineWidth = 3;
-    ctx.strokeRect(250, 115, 460, 190);
-    ctx.fillStyle = '#1f2e39';
-    ctx.font = '54px Segoe UI, sans-serif';
-    ctx.fillText('Game Over', 338, 175);
-    ctx.font = '30px Segoe UI, sans-serif';
-    ctx.fillText(`Final Score: ${score}`, 364, 220);
-    ctx.fillText(`Best Score: ${best}`, 368, 255);
-    ctx.font = '24px Segoe UI, sans-serif';
-    ctx.fillText('Press R to restart', 390, 286);
+    glassPanel(238, 108, 484, 206, true);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '700 66px Inter, Segoe UI, sans-serif';
+    ctx.fillText('Game Over', 300, 182);
+    ctx.font = '700 34px Inter, Segoe UI, sans-serif';
+    ctx.fillStyle = '#d8f4ff';
+    ctx.fillText(`Final Score: ${score}`, 360, 226);
+    ctx.fillText(`Best Score: ${best}`, 364, 264);
+    ctx.font = '600 24px Inter, Segoe UI, sans-serif';
+    ctx.fillText('Press R to restart', 390, 298);
   }
+}
+
+function glassPanel(x, y, w, h, strong = false) {
+  const panelGrad = ctx.createLinearGradient(x, y, x, y + h);
+  panelGrad.addColorStop(0, strong ? 'rgba(40,71,122,0.72)' : 'rgba(27,54,98,0.45)');
+  panelGrad.addColorStop(1, strong ? 'rgba(13,24,49,0.82)' : 'rgba(10,24,48,0.56)');
+  roundRect(x, y, w, h, 12, panelGrad);
+  ctx.strokeStyle = 'rgba(151,227,255,0.55)';
+  ctx.lineWidth = 1.2;
+  ctx.strokeRect(x + 1, y + 1, w - 2, h - 2);
 }
 
 function update() {
@@ -206,7 +286,7 @@ function update() {
     playTone(980, 0.05, 0.04);
   }
 
-  if (obstacles.some(o => intersects(dino.rect, o.rect))) {
+  if (obstacles.some((o) => intersects(dino.rect, o.rect))) {
     gameOver = true;
     playTone(180, 0.18, 0.06);
     if (!scoreSubmitted && score > 0) {
@@ -240,7 +320,7 @@ function handleJump() {
 }
 
 document.addEventListener('keydown', (e) => {
-  if ([" ", "ArrowUp", "ArrowDown"].includes(e.key)) e.preventDefault();
+  if ([' ', 'ArrowUp', 'ArrowDown'].includes(e.key)) e.preventDefault();
   if ((e.key === ' ' || e.key === 'ArrowUp') && !gameOver) handleJump();
   if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') dino.setDuck(true);
   if ((e.key === 'r' || e.key === 'R') && gameOver) reset();
