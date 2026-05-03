@@ -3,37 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>T-Rex Runner Web</title>
+  <title>Neon Dash Runner</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main class="wrapper">
-    <h1>🦖 T-Rex Runner</h1>
-    <p class="subtitle">Jump, duck, and survive. Compete on the global leaderboard.</p>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">Neon Dash Runner</div>
+      <div class="meta">Space/↑ Jump • ↓ Duck • P Pause</div>
+      <button id="audio-toggle" class="ghost-btn" type="button">🔊 Audio On</button>
+    </header>
 
-    <canvas id="game" width="960" height="420" aria-label="T-Rex Runner game canvas"></canvas>
-
-    <section class="controls">
-      <strong>Controls:</strong>
-      <span><kbd>Space</kbd>/<kbd>↑</kbd> Jump</span>
-      <span><kbd>↓</kbd>/<kbd>S</kbd> Duck</span>
-      <span><kbd>R</kbd> Restart</span>
+    <section class="stage-wrap">
+      <canvas id="game" width="1100" height="500" aria-label="Endless runner game canvas"></canvas>
+      <div id="overlay" class="overlay"></div>
     </section>
 
-    <section class="touch-controls" aria-label="touch controls">
-      <button id="btn-jump" type="button">Jump</button>
-      <button id="btn-duck" type="button">Duck</button>
-      <button id="btn-restart" type="button">Restart</button>
+    <section class="hud-row">
+      <div class="chip">Score: <strong id="score-value">0</strong></div>
+      <div class="chip">Best: <strong id="best-value">0</strong></div>
+      <div class="chip">x<span id="multiplier-value">1</span> Multiplier</div>
+      <div class="chip" id="power-status">No Power-up</div>
     </section>
 
-    <section class="leaderboard">
-      <h2>🏆 Live Leaderboard</h2>
-      <form id="score-form" class="score-form">
-        <input id="player-name" maxlength="20" placeholder="Enter your name" required />
-        <button id="btn-submit-score" type="submit">Submit Score</button>
-      </form>
-      <p id="score-message" class="score-message"></p>
-      <ol id="leaderboard-list"></ol>
+    <section class="touch-controls">
+      <button id="btn-jump" type="button">Jump / Tap</button>
+      <button id="btn-duck" type="button">Duck (Hold)</button>
+      <button id="btn-pause" type="button">Pause</button>
     </section>
   </main>
 
